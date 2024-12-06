@@ -135,4 +135,42 @@ Now, time to go do the projects!
 
 ## Linux
 
-TBD.
+### Supported Linux Machines:
+These instructions are tested on the following Linux distribution:
+* Kubuntu - 24.04.1 LTS (Noble Numbat)
+  
+Note: These instructions require a 64-bit architecture. You must be running a 64-bit version of a supported Ubuntu/Debian distribution.
+
+### Prerequisites
+Install the necessary dependencies:
+
+```bash 
+$ sudo apt update
+$ sudo apt install build-essential qemu qemu-system-x86 gcc gdb git
+```
+
+Clone the Xv6 repository:
+```bash
+---
+$ git clone git@github.com:mit-pdos/xv6-public.git 
+$ cd xv6-public
+```
+Build the Xv6 kernel:
+```bash
+$ make
+```
+Note: If you encounter errors related to warnings being treated as errors (due to the -Werror flag in the Makefile), you can disable this by removing the -Werror flag:
+1. Open the Makefile.
+2. Find the line that includes `-Werror`.
+3. Remove or comment out the -Werror option.
+This will allow the build to continue, even if there are warnings.
+
+To run Xv6 in QEMU (with GUI):
+```bash
+$ make qemu
+```
+
+To run Xv6 without a GUI:
+```bash
+$ make qemu-nox
+```
