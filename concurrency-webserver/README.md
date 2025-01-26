@@ -329,13 +329,13 @@ the following files:
   existing call to provide a version that either succeeds or exits. For
   example, the `open()` system call is used to open a file, but can fail for a
   number of reasons. The wrapper, `open_or_die()`, either successfully opens a
-  file or exists upon failure. 
+  file or exits upon failure. 
 - [`wclient.c`](https://github.com/remzi-arpacidusseau/ostep-projects/blob/master/concurrency-webserver/src/wclient.c): Contains main() and the support routines for the very simple
   web client. To test your server, you may want to change this code so that it
   can send simultaneous requests to your server. By launching `wclient`
   multiple times, you can test how your server handles concurrent requests.
 - [`spin.c`](https://github.com/remzi-arpacidusseau/ostep-projects/blob/master/concurrency-webserver/src/spin.c): A simple CGI program. Basically, it spins for a fixed amount
-  of time, which you may useful in testing various aspects of your server.  
+  of time, which you may find useful in testing various aspects of your server.  
 - [`Makefile`](https://github.com/remzi-arpacidusseau/ostep-projects/blob/master/concurrency-webserver/src/Makefile): We also provide you with a sample Makefile that creates
   `wserver`, `wclient`, and `spin.cgi`. You can type make to create all of 
   these programs. You can type make clean to remove the object files and the
