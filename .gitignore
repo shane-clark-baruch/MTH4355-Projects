@@ -1,0 +1,16 @@
+# Build artifacts
+*.o
+*.d
+*.img
+*.out
+
+# QEMU temporary files
+*.log
+
+# Editor/OS files
+.DS_Store
+*.swp
+
+# Dev container settings (if not shared)
+.devcontainer/
+
