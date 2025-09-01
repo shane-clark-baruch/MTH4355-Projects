@@ -76,7 +76,7 @@ file, i.e., it may be **VERY** long.
 
 - **Invalid files:** If the user specifies an input file or output file, and
 for some reason, when you try to open said file (e.g., `input.txt`) and
-fail, you should print out the following exact error message: `error:
+fail, you should print out the following exact error message: `reverse:
 cannot open file 'input.txt'` and then exit with return code 1 (i.e., call
 `exit(1);`).
 
