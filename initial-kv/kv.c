@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char db_file[] = "database.txt";
+char *db_file = "database.txt";
 /*
  * Database format: Count (int) Key (int) str_len(int) str Key strlen str ... 
  * */
@@ -67,7 +67,6 @@ void clear(list_t *list){
 }
 
 void list_destroy(list_t *list){
-    clear(list);
     free(list->head);
     free(list);
 }
@@ -81,14 +80,11 @@ void print_all(list_t *list){
 }
 
 void save_to_file(list_t *list){
-    FILE *fp = fopen(db_file, "w");
+    FILE *fp = fopen("database.txt", "w");
     if (!fp) {
-        perror("Failed to open database file for writing");
+        fprintf(stdout, "Failed to open database file for writing");
         return;
     }
-    fclose(fp);
-    
-    fp = fopen(db_file, "wb");
     
     // First, count the nodes
     int count = 0;
@@ -97,12 +93,10 @@ void save_to_file(list_t *list){
         count++;
         node = node->next;
     }
-    printf("count list: %d\n", count);
     fwrite(&count, sizeof(int), 1, fp);
 
     node = list->head->next;
     while (node) {
-        printf("count node: %d\n", node->k);
         fwrite(&node->k, sizeof(int), 1, fp);
         fwrite(&node->v_len, sizeof(int), 1, fp);
         fwrite(node->v, sizeof(char), node->v_len, fp);
@@ -147,7 +141,6 @@ int main(int argc, char *argv[]){
         }
         fclose(fp);
     }
-    print_all(db_list);
 
     if (argc < 2){
         list_destroy(db_list);
@@ -166,15 +159,16 @@ int main(int argc, char *argv[]){
         }
 
         if (strcmp(act, "p") == 0){
+  
             // Put key into database
-            char *key_str = strsep(&arg_copy, ",");
-            char *val_str = strsep(&arg_copy, ",");
+            char *key_str = strsep(&stringp, ",");
+            char *val_str = strsep(&stringp, ",");
             if (key_str && val_str){
                 char *str = malloc(strlen(val_str) + 1); 
                 int key = atoi(key_str); 
                 
                 strcpy(str, val_str);
-
+                //printf("key: %d val: %s", key, str);
                 db_t *node = db_list->head->next;
                 while (node){
                     if(node->k == key){
@@ -200,7 +194,7 @@ int main(int argc, char *argv[]){
             }
         } else if (strcmp(act, "g") == 0){
             // Get key from database
-            char *key_str = strsep(&arg_copy, ",");
+            char *key_str = strsep(&stringp, ",");
             int key = atoi(key_str); 
             if(key){ 
                 node = db_list->head->next;
@@ -210,10 +204,13 @@ int main(int argc, char *argv[]){
                         break;
                     }
                     node = node->next;
-                }      
+                }
+                if (node == NULL){
+                    fprintf(stdout, "%d not found\n", key);
+                }     
             }      
         } else if (strcmp(act, "d") == 0){
-            char *key_str = strsep(&arg_copy, ",");
+            char *key_str = strsep(&stringp, ",");
             if (key_str) { 
                 int key = atoi(key_str); 
     
