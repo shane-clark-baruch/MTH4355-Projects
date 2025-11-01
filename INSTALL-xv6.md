@@ -135,4 +135,17 @@ Now, time to go do the projects!
 
 ## Linux
 
-TBD.
+#### 1. make qemu
+```sh
+make qemu
+```
+#### 2. use system qemu-386 to start VM
+```sh
+#!/bin/sh
+# make qemu # uses the Makefile that builds and launches QEMU
+qemu-system-i386 -serial mon:stdio \
+  -drive file=xv6.img,index=0,media=disk,format=raw \
+  -drive file=fs.img,index=1,media=disk,format=raw \
+  -m 512 -smp 2
+# Remember: Press Ctrl-a X to exit VM!
+```
