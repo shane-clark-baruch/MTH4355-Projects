@@ -1,165 +1,211 @@
+// src/shell.c
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 #include <signal.h>
-#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <termios.h>
+#include "shell.h"
+#include "jobs.h"
 
-#define MAXTOK 256
-
-/* Reap children to avoid zombies */
-static void sigchld_handler(int sig) {
+/* SIGCHLD handler: delegate to jobs subsystem to reap and update states. */
+static void sigchld_handler(int sig)
+{
     (void)sig;
-    int saved = errno;
-    while (waitpid(-1, NULL, WNOHANG) > 0) {}
-    errno = saved;
+    reap_jobs();
 }
 
-/* Check if last token is & (background) */
-int is_background(char **argv, int argc) {
-    if (argc > 0 && argv[argc-1] && strcmp(argv[argc-1], "&") == 0) return 1;
+/* We want the shell to ignore Ctrl-C and Ctrl-Z itself; children will restore defaults.
+ * You can optionally implement a no-op handler for SIGTSTP, but ignoring is fine.
+ */
+static void sigtstp_ignore(int sig)
+{
+    (void)sig;
+    /* intentionally empty: shell itself ignores Ctrl-Z */
+}
+
+/* Helper: trim trailing whitespace and detect/strip a trailing '&' for background */
+static int strip_trailing_ampersand(char *line)
+{
+    if (!line)
+        return 0;
+    int L = (int)strlen(line);
+    /* trim trailing whitespace */
+    while (L > 0 && (line[L - 1] == ' ' || line[L - 1] == '\t'))
+    {
+        line[--L] = '\0';
+    }
+    if (L > 0 && line[L - 1] == '&')
+    {
+        line[L - 1] = '\0';
+        /* trim whitespace again in case there was space before & */
+        while (L > 0 && (line[L - 1] == ' ' || line[L - 1] == '\t'))
+        {
+            line[--L] = '\0';
+        }
+        return 1;
+    }
     return 0;
 }
 
-int main(void) {
+int main(void)
+{
     char *line = NULL;
     size_t cap = 0;
     ssize_t len;
 
-    /* install SIGCHLD handler to reap background children */
+    /* Initialize jobs subsystem and install SIGCHLD handler */
+    jobs_init();
     struct sigaction sa;
     sa.sa_handler = sigchld_handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     sigaction(SIGCHLD, &sa, NULL);
 
-    /* ignore SIGINT in the shell; children inherit default */
-    signal(SIGINT, SIG_IGN);
+    /* Shell ignores Ctrl-C and Ctrl-Z; children will reset to defaults. */
+    signal(SIGINT, SIG_IGN);         // shell ignores Ctrl-C
+    signal(SIGTSTP, sigtstp_ignore); // shell ignores Ctrl-Z
+    signal(SIGTTOU, SIG_IGN);
 
-    while (1) {
+    while (1)
+    {
         printf("osh> ");
         fflush(stdout);
 
         len = getline(&line, &cap, stdin);
-        if (len == -1) {
-            /* EOF (Ctrl-D) or error */
-            if (feof(stdin)) {
+        if (len == -1)
+        {
+            if (feof(stdin))
+            {
+                /* Ctrl-D / EOF */
                 printf("\n");
                 break;
-            } else {
-                perror("getline");
+            }
+            perror("getline");
+            continue;
+        }
+
+        /* remove trailing newline */
+        if (len > 0 && line[len - 1] == '\n')
+            line[len - 1] = '\0';
+
+        /* detect background operator (&) at end and strip it */
+        int background = strip_trailing_ampersand(line);
+
+        /* parse the line into a pipeline of command_t */
+        command_t *cmd = parse_line(line);
+        if (!cmd)
+            continue; /* empty line or parse error */
+
+        /* quick access to first command's argv for builtins */
+        char **argv = cmd->argv;
+
+        if (argv && argv[0])
+        {
+            /* built-in: exit */
+            if (strcmp(argv[0], "exit") == 0)
+            {
+                free_command_chain(cmd);
+                break;
+            }
+
+            /* built-in: cd */
+            if (strcmp(argv[0], "cd") == 0)
+            {
+                if (argv[1])
+                {
+                    if (chdir(argv[1]) != 0)
+                        perror("cd");
+                }
+                else
+                {
+                    char *home = getenv("HOME");
+                    if (home)
+                        chdir(home);
+                }
+                free_command_chain(cmd);
+                continue;
+            }
+
+            /* built-in: jobs */
+            if (strcmp(argv[0], "jobs") == 0)
+            {
+                list_jobs();
+                free_command_chain(cmd);
+                continue;
+            }
+
+            /* built-in: fg %N */
+            if (strcmp(argv[0], "fg") == 0)
+            {
+                if (!argv[1] || argv[1][0] != '%')
+                {
+                    printf("Usage: fg %%jobnum\n");
+                }
+                else
+                {
+                    int jobnum = atoi(argv[1] + 1);
+                    pid_t pgid = get_job_pgid(jobnum);
+                    if (pgid < 0)
+                    {
+                        printf("No such job\n");
+                    }
+                    else
+                    {
+                        /* give terminal to job and continue it */
+                        tcsetpgrp(STDIN_FILENO, pgid);
+                        kill(-pgid, SIGCONT);
+                        /* wait for any process in the group */
+                        int status;
+                        waitpid(-pgid, &status, WUNTRACED);
+                        /* restore terminal to shell */
+                        tcsetpgrp(STDIN_FILENO, getpgrp());
+                        /* if stopped, job handler (reap_jobs) or code below will add it */
+                    }
+                }
+                free_command_chain(cmd);
+                continue;
+            }
+
+            /* built-in: bg %N */
+            if (strcmp(argv[0], "bg") == 0)
+            {
+                if (!argv[1] || argv[1][0] != '%')
+                {
+                    printf("Usage: bg %%jobnum\n");
+                }
+                else
+                {
+                    int jobnum = atoi(argv[1] + 1);
+                    pid_t pgid = get_job_pgid(jobnum);
+                    if (pgid < 0)
+                    {
+                        printf("No such job\n");
+                    }
+                    else
+                    {
+                        kill(-pgid, SIGCONT);
+                        set_job_state(pgid, JOB_RUNNING);
+                    }
+                }
+                free_command_chain(cmd);
                 continue;
             }
         }
 
-        if (len > 0 && line[len-1] == '\n') line[len-1] = '\0';
-
-        /* simple whitespace tokenization (no quoting support yet) */
-        char *saveptr;
-        char *tok = strtok_r(line, " \t", &saveptr);
-        char *argv[MAXTOK];
-        int argc = 0;
-        while (tok && argc < MAXTOK-1) {
-            argv[argc++] = tok;
-            tok = strtok_r(NULL, " \t", &saveptr);
-        }
-        argv[argc] = NULL;
-
-        if (argc == 0) continue; /* empty line */
-
-        /* builtins */
-        if (strcmp(argv[0], "exit") == 0) {
-            break;
-        }
-        if (strcmp(argv[0], "cd") == 0) {
-            if (argc > 1) {
-                if (chdir(argv[1]) != 0) perror("cd");
-            } else {
-                char *home = getenv("HOME");
-                if (home) chdir(home);
-            }
-            continue;
+        /* otherwise execute the pipeline (execute_pipeline handles background & job registration) */
+        int rc = execute_pipeline(cmd, background, line);
+        if (rc < 0)
+        {
+            fprintf(stderr, "osh: failed to execute command\n");
         }
 
-        /* background? */
-        int background = is_background(argv, argc);
-        if (background) {
-            argv[argc-1] = NULL;
-            argc--;
-        }
-
-        /* handle simple redirection tokens: >, >>, <  (single redirect only) */
-        int redirect_out = 0, redirect_append = 0, redirect_in = 0;
-        char *out_file = NULL, *in_file = NULL;
-        for (int i = 0; i < argc; ++i) {
-            if (strcmp(argv[i], ">") == 0 && i+1 < argc) {
-                redirect_out = 1;
-                out_file = argv[i+1];
-                argv[i] = NULL;
-                argc = i;
-                break;
-            } else if (strcmp(argv[i], ">>") == 0 && i+1 < argc) {
-                redirect_append = 1;
-                out_file = argv[i+1];
-                argv[i] = NULL;
-                argc = i;
-                break;
-            } else if (strcmp(argv[i], "<") == 0 && i+1 < argc) {
-                redirect_in = 1;
-                in_file = argv[i+1];
-                argv[i] = NULL;
-                argc = i;
-                break;
-            }
-        }
-
-        pid_t pid = fork();
-        if (pid < 0) {
-            perror("fork");
-            continue;
-        }
-
-        if (pid == 0) {
-            
-            signal(SIGINT, SIG_DFL);
-
-            /* setup I/O redirection if requested */
-            if (redirect_in && in_file) {
-                int fd = open(in_file, O_RDONLY);
-                if (fd < 0) { perror("open input"); exit(1); }
-                if (dup2(fd, STDIN_FILENO) < 0) { perror("dup2"); exit(1); }
-                close(fd);
-            }
-            if ((redirect_out || redirect_append) && out_file) {
-                int flags = O_WRONLY | O_CREAT;
-                if (redirect_append) flags |= O_APPEND;
-                else flags |= O_TRUNC;
-                int fd = open(out_file, flags, 0644);
-                if (fd < 0) { perror("open output"); exit(1); }
-                if (dup2(fd, STDOUT_FILENO) < 0) { perror("dup2"); exit(1); }
-                close(fd);
-            }
-
-            /* exec the program */
-            execvp(argv[0], argv);
-            /* if exec fails: */
-            perror("execvp");
-            exit(127);
-        } else {
-            /* parent */
-            if (!background) {
-                int status;
-                waitpid(pid, &status, 0);
-            } else {
-                printf("[bg] pid %d\n", pid);
-               
-            }
-        }
-    } /* end loop */
+        free_command_chain(cmd);
+    } /* end while */
 
     free(line);
+    jobs_shutdown();
     return 0;
 }
