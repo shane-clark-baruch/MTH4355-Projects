@@ -1,10 +1,13 @@
 CC=clang
-CFLAGS=-Wall -Wextra -std=gnu11
+CFLAGS=-Wall -Wextra -std=gnu11 -Iinclude
+
+SRC=src/shell.c src/parser.c src/exec.c src/jobs.c
+OBJ=$(SRC)
 
 all: shell
 
-shell: src/shell.c
-	$(CC) $(CFLAGS) -o shell src/shell.c
+shell: $(SRC)
+	$(CC) $(CFLAGS) -o shell $(SRC)
 
 clean:
 	rm -f shell
