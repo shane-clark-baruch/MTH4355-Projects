@@ -205,6 +205,41 @@ even this line, which has barfood in it, will be printed.
 * For simplicity, if passed the empty string as a search string, **wgrep**
   can either match NO lines or match ALL lines, both are acceptable.
 
+
+
+## sed
+
+The next tool you will build is `wsed`, which is based the stream editor `sed`. This unix function has 
+a wide range of utilities, but we will focus on two features, string substitution and character replacemnt.
+
+Before we begin, I recommend you read paruse the man pages and try to use the `sed` function if you have not already. 
+Let's assume that a text file called `test.txt` contains the contents
+
+```.txt
+super duper
+hello there
+```
+
+then we can replace all `p`'s with `s`'s through the command.
+
+```.sh
+> sed 'y/p/s/' test.txt
+suser duser
+hello there
+```
+
+We can also replaces phrases with string subsitution. The example below replaces all occurences of the word `there` with `stranger`.
+
+```.sh
+sed 's/there/stranger/' test.txt
+super duper
+hello stranger
+```
+Notice that these two commands output the standard output to `stdout` by default. We will learn how to implement redirection in project 3.
+
+
+
+<!-- 
 ## wzip and wunzip
 
 The next tools you will build come in a pair, because one (**wzip**) is a
@@ -275,7 +310,7 @@ and print out the uncompressed output to standard output using **printf()**.
   uncompressed stream of text (thus, the information that multiple files were
   originally input into **wzip** is lost). The same thing holds for
   **wunzip**. 
-
+-->
 
 ### Footnotes
 
