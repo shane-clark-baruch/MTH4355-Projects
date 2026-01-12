@@ -9,17 +9,9 @@ slightly different name to avoid confusion; for example, instead of **cat**,
 you'll be implementing **wcat** (i.e., "wisconsin" cat).
 
 Objectives:
-* Re-familiarize yourself with the C programming language
-* Re-familiarize yourself with a shell / terminal / command-line of UNIX
-* Learn (as a side effect) how to use a proper code editor such as emacs
+* Familiarize yourself with the C programming language
+* Familiarize yourself with a shell / terminal / command-line of UNIX
 * Learn a little about how UNIX utilities are implemented
-
-While the project focuses upon writing simple C programs, you can see from the
-above that even that requires a bunch of other previous knowledge, including a
-basic idea of what a shell is and how to use the command line on some
-UNIX-based systems (e.g., Linux or macOS), how to use an editor such as emacs,
-and of course a basic understanding of C programming. If you **do not** have
-these skills already, this is not the right place to start.
 
 Summary of what gets turned in:
 * A bunch of single .c files for each of the utilities below: **wcat.c**,
@@ -73,7 +65,8 @@ will you learn to use it properly?
 On UNIX systems, the best way to read about such functions is to use what are
 called the **man** pages (short for **manual**). In our HTML/web-driven world,
 the man pages feel a bit antiquated, but they are useful and informative and
-generally quite easy to use.
+generally quite easy to use. The Linux man pages are slightly different than those built
+in on MAC, I typically use the pages recommended [here](https://man7.org/linux/man-pages/index.html).
 
 To access the man page for **fopen()**, for example, just type the following
 at your UNIX shell prompt: 
