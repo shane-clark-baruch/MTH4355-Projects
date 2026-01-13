@@ -207,7 +207,7 @@ even this line, which has barfood in it, will be printed.
 
 
 
-## sed
+## wsed
 
 The next tool you will build is `wsed`, which is based the stream editor `sed`. This unix function has 
 a wide range of utilities, but we will focus on two features, string substitution and character replacemnt.
