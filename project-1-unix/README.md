@@ -237,7 +237,23 @@ hello stranger
 ```
 Notice that these two commands output the standard output to `stdout` by default. We will learn how to implement redirection in project 3.
 
+**Details**
 
+* Your program **wsed** must be invoked with an \[option\] and one or more files on the command
+  line; it should just print out each file in turn. The options are outlined below. 
+  * `./wsed "s/regexp/replacement/" file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`.
+  * `./wsed "y/source/dest/" file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. 
+* In all non-error cases, **wsed** should exit with status code 0, usually by
+  returning a 0 from **main()** (or by calling **exit(0)**).
+* If *no files* are specified on the command line, **wsed** should just exit
+  and return 0. Note that this is slightly different than the behavior of 
+  normal UNIX **cat** (if you'd like to, figure out the difference).
+* If the program tries to **fopen()** a file and fails, it should print the
+  exact message "wsed: cannot open file" (followed by a newline) and exit
+  with status code 1.  If multiple files are specified on the command line,
+  the files should be printed out in order until the end of the file list is
+  reached or an error opening a file is reached (at which point the error
+  message is printed and **wsed** exits). 
 
 <!-- 
 ## wzip and wunzip
