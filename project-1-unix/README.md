@@ -207,6 +207,7 @@ even this line, which has barfood in it, will be printed.
 
 
 
+
 ## wsed
 
 The next tool you will build is `wsed`, which is based the stream editor `sed`. This unix function has 
@@ -253,8 +254,16 @@ Notice that these two commands output the standard output to `stdout` by default
   with status code 1.  If multiple files are specified on the command line,
   the files should be printed out in order until the end of the file list is
   reached or an error opening a file is reached (at which point the error
-  message is printed and **wsed** exits). 
+  message is printed and **wsed** exits).
 
+### Useful Functions
+
+* `printf` and `fprintf`: Need these to print, check man pages for when to use which.
+* `fopen` and `fclose`: Need these to open and close files.
+* `getline`, `fgets` and `fgetc`: Useful functions to read lines, strings, charcaters from a file pointer.
+* `strstr`, `strlen`, `strcat`, `strtok`, `strsep`: Useful functions when working with string.
+* `free`: While you may not use `alloc` in your function directly, some functions mentioned above do! Make sure to read
+   the man pages and determine when a `free` is needed.
 
 ### Footnotes
 
@@ -263,6 +272,8 @@ Notice that these two commands output the standard output to `stdout` by default
 C library, but at some point, you've just got to **read documentation** to
 learn what is available. Why not now, when you are young? Or, if you are old,
 why not now, before it's ... ahem ... too late?
+
+
 
 
 
