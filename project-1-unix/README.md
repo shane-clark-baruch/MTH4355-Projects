@@ -232,7 +232,7 @@ hello there
 We can also replaces phrases with string subsitution. The example below replaces all occurences of the word `there` with `stranger`.
 
 ```.sh
-sed 's/there/stranger/' test.txt
+> sed 's/there/stranger/' test.txt
 super duper
 hello stranger
 ```
