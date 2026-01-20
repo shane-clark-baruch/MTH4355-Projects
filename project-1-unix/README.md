@@ -221,49 +221,68 @@ super duper
 hello there
 ```
 
-then we can replace all `p`'s with `s`'s through the command.
+then we can replace all `p`'s with `s`'s using the **translation** functionality of `sed` with the format `sed y/source/dest/ file`.
 
 ```.sh
-> sed 'y/p/s/' test.txt
+prompt> sed 'y/p/s/' test.txt
 suser duser
 hello there
 ```
 
-We can also replaces phrases with string subsitution. The example below replaces all occurences of the word `there` with `stranger`.
+We can also replaces phrases with string **subsitution** using `> sed s/regexp/replacement/ file`. The example below replaces all occurences of the word `there` with `stranger`.
 
 ```.sh
-> sed 's/there/stranger/' test.txt
+prompt> sed 's/there/stranger/' test.txt
 super duper
 hello stranger
 ```
 Notice that these two commands output the standard output to `stdout` by default. We will learn how to implement redirection in project 3.
 
+Our version, `wsed`, will focus on building the two functionalities of `sed` outlined above, but will have a slightly different call method. Insted, `wsed` will be called with the formatting `./wsed [option] [val1] [val2] [file]`, where:
+
+* `[option]` is either `-s` or `-y` for substitution or translation
+* `[val1]` and `[val2]`: In substitution mode, they correspond to the `regexp` and `replacement`. In translation mode, the correspond to  `source` and `dest`.
+* `[file]` is the file we will be modifying. 
+
+For example, the command
+
+```.sh
+prompt> sed "y/ab/ba/" test.txt
+```
+
+will be replaced by
+
+```.sh
+prompt> ./wsed -y ab ba test.txt
+```
+
 **Details**
 
 * Your program **wsed** must be invoked with an \[option\] and one file on the command
   line; it should just print out each file in turn. The options are outlined below. 
-  * `./wsed s/regexp/replacement/ file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
-  * `./wsed y/source/dest/ file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed: y/source/dest/ source and dest must have same length`, return 1, and exit.
+  * `./wsed -s regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
+  * `./wsed -y source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed -y source dest: source and dest must have same length`, return 1, and exit.
 * In all non-error cases, **wsed** should exit with status code 0, usually by
   returning a 0 from **main()** (or by calling **exit(0)**).
-* If **wsed** is passed no command-line arguments, it should print
-  "wsed: \[command\] [file]" (followed by a newline) and exit with
+* If **wsed** is passed incorrect formatting (for example, not enough or two many arguments), it should print
+  `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
+  status 1.  
+*  **wsed** can only accept one option at a time (`-s` or `-y). If the user attempts to invoke both, then wsed should print
+  `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
   status 1.  
 * If the program tries to **fopen()** a file and fails, it should print the
   exact message "wsed: cannot open file" (followed by a newline) and exit
-  with status code 1.  If multiple files are specified on the command line,
-  the files should be printed out in order until the end of the file list is
-  reached or an error opening a file is reached (at which point the error
-  message is printed and **wsed** exits).
+  with status code 1.
 
 ### Useful Functions
 
-* `printf` and `fprintf`: Need these to print, check man pages for when to use which.
+* `printf` and `fprintf`: Need these to print, check man pages for when to use which and the format specifiers for each.
 * `fopen` and `fclose`: Need these to open and close files.
 * `getline`, `fgets` and `fgetc`: Useful functions to read lines, strings, charcaters from a file pointer.
 * `strstr`, `strlen`, `strcat`, `strtok`, `strsep`: Useful functions when working with string.
-* `free`: While you may not use `alloc` in your function directly, some functions mentioned above do! Make sure to read
+* `free`: While you may not use `malloc` in your function directly, some functions mentioned above do! Make sure to read
    the man pages and determine when a `free` is needed.
+* `getopt` is the function we recommend using in order to detect the option `-s` and `-y` in `wsed`. 
 
 ### Footnotes
 
