@@ -1,0 +1,1 @@
+./wsed -y e a tests/1.in
