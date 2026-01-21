@@ -267,7 +267,7 @@ prompt> ./wsed -y ab ba test.txt
 * If **wsed** is passed incorrect formatting (for example, not enough or two many arguments), it should print
   `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
   status 1.  
-*  **wsed** can only accept one option at a time (`-s` or `-y). If the user attempts to invoke both, then wsed should print
+*  **wsed** can only accept one option at a time (`-s` or `-y`). If the user attempts to invoke both, then wsed should print
   `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
   status 1.  
 * If the program tries to **fopen()** a file and fails, it should print the
