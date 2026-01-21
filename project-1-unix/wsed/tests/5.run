@@ -1,2 +1,1 @@
-./wgrep alksdjfhalskdfhjasdlkfjhadslkfjhasdlkfjhasdlkfjhasdlkfjhdaslkfjhadslkfjhasdlkfjhadslkfjhdsalkjfhsadlkjfh tests/5.in
-
+./wsed -y longer short tests/5.in

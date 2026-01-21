@@ -1,1 +1,1 @@
-./wgrep this tests/2.in
+./wsed -s test TEST tests/2.in

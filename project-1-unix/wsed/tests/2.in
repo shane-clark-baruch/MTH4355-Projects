@@ -1,0 +1,3 @@
+a simple test of sed
+which tests whether you can find the word "test"
+and change it to TEST
