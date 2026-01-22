@@ -211,9 +211,9 @@ even this line, which has barfood in it, will be printed.
 ## wsed
 
 The next tool you will build is `wsed`, which is based the stream editor `sed`. This unix function has 
-a wide range of utilities, but we will focus on two features, string substitution and character replacemnt.
+a wide range of utilities, but we will focus on two features, string **substitution** and character **translation**.
 
-Before we begin, I recommend you read paruse the man pages and try to use the `sed` function if you have not already. 
+Before we begin, I recommend you read peruse the man pages and try to use the `sed` function if you have not already. 
 Let's assume that a text file called `test.txt` contains the contents
 
 ```.txt
@@ -221,28 +221,30 @@ super duper
 hello there
 ```
 
-then we can replace all `p`'s with `s`'s using the **translation** functionality of `sed` with the format `sed y/source/dest/ file`.
+then we can replace all `p`'s with `s`'s and `l`'s with `a`'s using the **translation** functionality of `sed` with the format `sed y/source/dest/ file`.
 
 ```.sh
-prompt> sed 'y/p/s/' test.txt
+prompt> sed y/pl/sa/ test.txt
 suser duser
-hello there
+heaao there
 ```
 
-We can also replaces phrases with string **subsitution** using `> sed s/regexp/replacement/ file`. The example below replaces all occurences of the word `there` with `stranger`.
+We can also replaces substrings with **subsitution** using `> sed s/regexp/replacement/g file`. The example below replaces all occurrences of the word `there` with `stranger`. Notice that this replacement is done globally to ensure all occurrences are replaced. 
 
 ```.sh
-prompt> sed 's/there/stranger/' test.txt
+prompt> sed s/there/stranger/g test.txt
 super duper
 hello stranger
 ```
 Notice that these two commands output the standard output to `stdout` by default. We will learn how to implement redirection in project 3.
 
-Our version, `wsed`, will focus on building the two functionalities of `sed` outlined above, but will have a slightly different call method. Insted, `wsed` will be called with the formatting `./wsed [option] [val1] [val2] [file]`, where:
+Our version, `wsed`, will focus on building the two functionalities of `sed` outlined above, but will have a slightly different call method. Instead, `wsed` will be called with the formatting `./wsed [OPTIONS] [val1] [val2] [file]`, where:
 
-* `[option]` is either `-s` or `-y` for substitution or translation
+* `[OPTIONS]`
+  * `-m substitution` or `-m translation`. Substitution is chosen by default. 
+  * `--help` will print a helpful message to the user on the usage of this program. We will provide the exact message in the testing files.
 * `[val1]` and `[val2]`: In substitution mode, they correspond to the `regexp` and `replacement`. In translation mode, the correspond to  `source` and `dest`.
-* `[file]` is the file we will be modifying. 
+* `[file]` is the file we will be reading. 
 
 For example, the command
 
@@ -253,25 +255,26 @@ prompt> sed "y/ab/ba/" test.txt
 will be replaced by
 
 ```.sh
-prompt> ./wsed -y ab ba test.txt
+prompt> ./wsed -m translation ab ba test.txt
 ```
 
 **Details**
 
 * Your program **wsed** must be invoked with an \[option\] and one file on the command
   line; it should just print out each file in turn. The options are outlined below. 
-  * `./wsed -s regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
-  * `./wsed -y source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed -y source dest: source and dest must have same length`, return 1, and exit.
+  * `./wsed -m substitution regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
+  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed -y source dest: source and dest must have same length`, return 1, and exit.
+  * `./wsed --help` prints out the help text for this program.
 * In all non-error cases, **wsed** should exit with status code 0, usually by
   returning a 0 from **main()** (or by calling **exit(0)**).
 * If **wsed** is passed incorrect formatting (for example, not enough or two many arguments), it should print
   `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
   status 1.  
-*  **wsed** can only accept one option at a time (`-s` or `-y). If the user attempts to invoke both, then wsed should print
+*  **wsed** can only accept one mode at a time. If the user attempts to invoke both, then `wsed` should print
   `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
   status 1.  
 * If the program tries to **fopen()** a file and fails, it should print the
-  exact message "wsed: cannot open file" (followed by a newline) and exit
+  exact message `wsed: cannot open file` (followed by a newline) and exit
   with status code 1.
 
 ### Useful Functions
@@ -282,7 +285,7 @@ prompt> ./wsed -y ab ba test.txt
 * `strstr`, `strlen`, `strcat`, `strtok`, `strsep`: Useful functions when working with string.
 * `free`: While you may not use `malloc` in your function directly, some functions mentioned above do! Make sure to read
    the man pages and determine when a `free` is needed.
-* `getopt` is the function we recommend using in order to detect the option `-s` and `-y` in `wsed`. 
+* `getopt` and `getoptlong` is the function we recommend using in order to detect the option `-m` and `--help` in `wsed`. 
 
 ### Footnotes
 
