@@ -205,77 +205,87 @@ even this line, which has barfood in it, will be printed.
 * For simplicity, if passed the empty string as a search string, **wgrep**
   can either match NO lines or match ALL lines, both are acceptable.
 
-## wzip and wunzip
 
-The next tools you will build come in a pair, because one (**wzip**) is a
-file compression tool, and the other (**wunzip**) is a file decompression
-tool. 
 
-The type of compression used here is a simple form of compression called
-*run-length encoding* (*RLE*). RLE is quite simple: when you encounter **n**
-characters of the same type in a row, the compression tool (**wzip**) will
-turn that into the number **n** and a single instance of the character.
 
-Thus, if we had a file with the following contents:
-```
-aaaaaaaaaabbbb
-```
-the tool would turn it (logically) into:
-```
-10a4b
+## wsed
+
+The next tool you will build is `wsed`, which is based the stream editor `sed`. This unix function has 
+a wide range of utilities, but we will focus on two features, string **substitution** and character **translation**.
+
+Before we begin, I recommend you read peruse the man pages and try to use the `sed` function if you have not already. 
+Let's assume that a text file called `test.txt` contains the contents
+
+```.txt
+super duper
+hello there
 ```
 
-However, the exact format of the compressed file is quite important; here,
-you will write out a 4-byte integer in binary format followed by the single
-character in ASCII. Thus, a compressed file will consist of some number of
-5-byte entries, each of which is comprised of a 4-byte integer (the run
-length) and the single character. 
+then we can replace all `p`'s with `s`'s and `l`'s with `a`'s using the **translation** functionality of `sed` with the format `sed y/source/dest/ file`.
 
-To write out an integer in binary format (not ASCII), you should use
-**fwrite()**. Read the man page for more details. For **wzip**, all
-output should be written to standard output (the **stdout** file stream,
-which, as with **stdin**, is already open when the program starts running). 
-
-Note that typical usage of the **wzip** tool would thus use shell 
-redirection in order to write the compressed output to a file. For example,
-to compress the file **file.txt** into a (hopefully smaller) **file.z**,
-you would type:
-
-```
-prompt> ./wzip file.txt > file.z
+```.sh
+prompt> sed y/pl/sa/ test.txt
+suser duser
+heaao there
 ```
 
-The "greater than" sign is a UNIX shell redirection; in this case, it ensures
-that the output from **wzip** is written to the file **file.z** (instead of
-being printed to the screen). You'll learn more about how this works a little
-later in the course.
+We can also replaces substrings with **subsitution** using `> sed s/regexp/replacement/g file`. The example below replaces all occurrences of the word `there` with `stranger`. Notice that this replacement is done globally to ensure all occurrences are replaced. 
 
-The **wunzip** tool simply does the reverse of the **wzip** tool, taking
-in a compressed file and writing (to standard output again) the uncompressed
-results. For example, to see the contents of **file.txt**, you would type:
-
+```.sh
+prompt> sed s/there/stranger/g test.txt
+super duper
+hello stranger
 ```
-prompt> ./wunzip file.z
+Notice that these two commands output the standard output to `stdout` by default. We will learn how to implement redirection in project 3.
+
+Our version, `wsed`, will focus on building the two functionalities of `sed` outlined above, but will have a slightly different call method. Instead, `wsed` will be called with the formatting `./wsed [OPTIONS] [val1] [val2] [file]`, where:
+
+* `[OPTIONS]`
+  * `-m substitution` or `-m translation`. Substitution is chosen by default. 
+  * `--help` will print a helpful message to the user on the usage of this program. We will provide the exact message in the testing files.
+* `[val1]` and `[val2]`: In substitution mode, they correspond to the `regexp` and `replacement`. In translation mode, the correspond to  `source` and `dest`.
+* `[file]` is the file we will be reading. 
+
+For example, the command
+
+```.sh
+prompt> sed "y/ab/ba/" test.txt
 ```
 
-**wunzip** should read in the compressed file (likely using **fread()**)
-and print out the uncompressed output to standard output using **printf()**.
+will be replaced by
+
+```.sh
+prompt> ./wsed -m translation ab ba test.txt
+```
 
 **Details**
 
-* Correct invocation should pass one or more files via the command line to the 
-  program; if no files are specified, the program should exit with return code
-  1 and print "wzip: file1 [file2 ...]" (followed by a newline) or
-  "wunzip: file1 [file2 ...]" (followed by a newline) for **wzip** and
-  **wunzip** respectively. 
-* The format of the compressed file must match the description above exactly
-  (a 4-byte integer followed by a character for each run).
-* Do note that if multiple files are passed to **wzip*, they are compressed
-  into a single compressed output, and when unzipped, will turn into a single
-  uncompressed stream of text (thus, the information that multiple files were
-  originally input into **wzip** is lost). The same thing holds for
-  **wunzip**. 
+* Your program **wsed** must be invoked with an \[option\] and one file on the command
+  line; it should just print out each file in turn. The options are outlined below. 
+  * `./wsed -m substitution regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
+  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed -y source dest: source and dest must have same length`, return 1, and exit.
+  * `./wsed --help` prints out the help text for this program.
+* In all non-error cases, **wsed** should exit with status code 0, usually by
+  returning a 0 from **main()** (or by calling **exit(0)**).
+* If **wsed** is passed incorrect formatting (for example, not enough or two many arguments), it should print
+  `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
+  status 1.  
+*  **wsed** can only accept one mode at a time. If the user attempts to invoke both, then `wsed` should print
+  `wsed: [option] [val1] [val2] [file]` (followed by a newline) and exit with
+  status 1.  
+* If the program tries to **fopen()** a file and fails, it should print the
+  exact message `wsed: cannot open file` (followed by a newline) and exit
+  with status code 1.
 
+### Useful Functions
+
+* `printf` and `fprintf`: Need these to print, check man pages for when to use which and the format specifiers for each.
+* `fopen` and `fclose`: Need these to open and close files.
+* `getline`, `fgets` and `fgetc`: Useful functions to read lines, strings, charcaters from a file pointer.
+* `strstr`, `strlen`, `strcat`, `strtok`, `strsep`: Useful functions when working with string.
+* `free`: While you may not use `malloc` in your function directly, some functions mentioned above do! Make sure to read
+   the man pages and determine when a `free` is needed.
+* `getopt` and `getoptlong` is the function we recommend using in order to detect the option `-m` and `--help` in `wsed`. 
 
 ### Footnotes
 
@@ -284,6 +294,8 @@ and print out the uncompressed output to standard output using **printf()**.
 C library, but at some point, you've just got to **read documentation** to
 learn what is available. Why not now, when you are young? Or, if you are old,
 why not now, before it's ... ahem ... too late?
+
+
 
 
 

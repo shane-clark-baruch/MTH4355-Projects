@@ -1,0 +1,1 @@
+./wsed -y this that tests/2.in

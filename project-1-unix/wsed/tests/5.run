@@ -1,0 +1,1 @@
+./wsed -y longer short tests/5.in
