@@ -263,7 +263,7 @@ prompt> ./wsed -m translation ab ba test.txt
 * Your program **wsed** must be invoked with an \[option\] and one file on the command
   line; it should just print out each file in turn. The options are outlined below. 
   * `./wsed -m substitution regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
-  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed -y source dest: source and dest must have same length`, return 1, and exit.
+  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed: Translation strings not equal length`(followed by a newline), return 1, and exit.
   * `./wsed --help` prints out the help text for this program.
 * In all non-error cases, **wsed** should exit with status code 0, usually by
   returning a 0 from **main()** (or by calling **exit(0)**).
