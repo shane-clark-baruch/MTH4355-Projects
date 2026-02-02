@@ -1,2 +1,1 @@
-./wsed -s jump alksdjfhalskdfhjasdlkfjhadslkfjhasdlkfjhasdlkfjhasdlkfjhdaslkfjhadslkfjhasdlkfjhadslkfjhdsalkjfhsadlkjfh tests/5.in
-
+./wsed -m substitution jump alksdjfhalskdfhjasdlkfjhadslkfjhasdlkfjhasdlkfjhasdlkfjhdaslkfjhadslkfjhasdlkfjhadslkfjhdsalkjfhsadlkjfh tests/6.in

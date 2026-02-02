@@ -1,0 +1,13 @@
+a simple test of sed using the substitution mode
+which tests whether you can find the word "substitution"
+and change it to substitution
+because the 
+
+substitution 
+
+mode 
+
+of wsed
+
+
+is substitution

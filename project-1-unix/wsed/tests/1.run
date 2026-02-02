@@ -1,1 +1,1 @@
-./wsed -y e a tests/1.in
+./wsed -m translation e a tests/1.in

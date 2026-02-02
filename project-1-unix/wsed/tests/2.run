@@ -1,1 +1,1 @@
-./wsed -s test TEST tests/2.in
+./wsed -m substitution test TEST tests/2.in

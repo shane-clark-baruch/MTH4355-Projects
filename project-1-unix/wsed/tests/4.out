@@ -1,1 +1,1 @@
-wgrep: searchterm [file ...]
+wsed: [option] [val1] [val2] [file]
