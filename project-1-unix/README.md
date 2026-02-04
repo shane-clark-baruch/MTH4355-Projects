@@ -229,7 +229,7 @@ suser duser
 heaao there
 ```
 
-We can also replaces substrings with **subsitution** using `> sed s/regexp/replacement/g file`. The example below replaces all occurrences of the word `there` with `stranger`. Notice that this replacement is done globally to ensure all occurrences are replaced. 
+We can also replaces substrings with **subsitution** using `> sed s/initial/final/g file`. The example below replaces all occurrences of the word `there` with `stranger`. Notice that this replacement is done globally to ensure all occurrences are replaced. 
 
 ```.sh
 prompt> sed s/there/stranger/g test.txt
@@ -243,7 +243,7 @@ Our version, `wsed`, will focus on building the two functionalities of `sed` out
 * `[OPTIONS]`
   * `-m substitution` or `-m translation`. Substitution is chosen by default. 
   * `--help` will print a helpful message to the user on the usage of this program. We will provide the exact message in the testing files.
-* `[val1]` and `[val2]`: In substitution mode, they correspond to the `regexp` and `replacement`. In translation mode, the correspond to  `source` and `dest`.
+* `[val1]` and `[val2]`: In substitution mode, all occurences of `val1` are replaced by `val2`. In translation mode, each character of `val1` is replaced with the corresponding character of `val2`.
 * `[file]` is the file we will be reading. 
 
 For example, the command
@@ -262,9 +262,9 @@ prompt> ./wsed -m translation ab ba test.txt
 
 * Your program **wsed** must be invoked with an \[option\] and one file on the command
   line; it should just print out each file in turn. The options are outlined below. 
-  * `./wsed -m substitution regexp replacement file`:   Attempt to match `regexp` against the pattern space. If successful, replace that portion matched with `replacement`. 
-  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `source` to the corresponding character in `dest`. If the `source` and `dest` strings are of different lengths, then you should print `wsed: Translation strings not equal length`(followed by a newline), return 1, and exit.
-  * `./wsed --help` prints out the help text for this program.
+  * `./wsed -m substitution val1 val2 file`:   Attempt to match `val1` against the pattern space. If successful, replace that portion matched with `val2`. 
+  * `./wsed -m translation source dest file`: Transliterate the characters in the pattern space which appear in `val1` to the corresponding character in `val2`. If the `val1` and `val2` strings are of different lengths, then you should print `wsed: Translation strings not equal length`(followed by a newline), return 1, and exit.
+  * `./wsed --help` and `./wsed -h` prints out the help text for this program. For detailed output, check tests/10.out.
 * In all non-error cases, **wsed** should exit with status code 0, usually by
   returning a 0 from **main()** (or by calling **exit(0)**).
 * If **wsed** is passed incorrect formatting (for example, not enough or two many arguments), it should print
