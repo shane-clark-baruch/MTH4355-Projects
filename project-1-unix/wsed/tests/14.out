@@ -1,0 +1,6 @@
+Usage: wsed [-m mode] [initial] [final] [file]
+-m  mode
+	"substitution" or "translation". Default: substitution.
+initial & final
+	 in substitution, all occurrences of initial in [file] are replaced with final
+	 in translation, each character in initial is replaced with the the corresponding character from final in [file]
