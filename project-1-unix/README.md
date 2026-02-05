@@ -276,6 +276,7 @@ prompt> ./wsed -m translation ab ba test.txt
 * If the program tries to **fopen()** a file and fails, it should print the
   exact message `wsed: cannot open file` (followed by a newline) and exit
   with status code 1.
+* **SPECIAL NOTE** The error message with `getopt` is system dependent and can cause you to fail test case 12 when your code is correct. This should be ignored and will receieve full credit upon grading.
 
 ### Useful Functions
 
