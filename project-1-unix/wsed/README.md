@@ -12,7 +12,8 @@ test 2: passed
 test 3: passed
 test 4: passed
 test 5: passed
-test 6: passed
+...
+test 13: passed
 prompt>
 ```
 

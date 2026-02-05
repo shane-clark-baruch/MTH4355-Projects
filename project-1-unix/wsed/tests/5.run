@@ -1,1 +1,1 @@
-./wsed -y longer short tests/5.in
+./wsed -m translation longer short tests/5.in

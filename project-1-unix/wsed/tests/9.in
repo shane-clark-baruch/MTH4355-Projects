@@ -1,0 +1,13 @@
+a simple test of sed using the default mode
+which tests whether you can find the word "default"
+and change it to substitution
+because the 
+
+default 
+
+mode 
+
+of wsed
+
+
+is substitution

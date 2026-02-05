@@ -1,0 +1,1 @@
+./wsed -m what abc 123 tests/1.in
