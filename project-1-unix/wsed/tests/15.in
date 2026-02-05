@@ -1,0 +1,4 @@
+a simple test of sed
+which checks whether 
+You detect numerics like 1245823491123682
+And special characters like !@*$@$"::#

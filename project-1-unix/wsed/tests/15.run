@@ -1,0 +1,1 @@
+./wsed -m translation 'abc123!@#' '123!@#abc' tests/15.in
