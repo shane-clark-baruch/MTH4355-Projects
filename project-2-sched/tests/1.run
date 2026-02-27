@@ -1,0 +1,1 @@
+./sched -m FIFO < tests/1.in

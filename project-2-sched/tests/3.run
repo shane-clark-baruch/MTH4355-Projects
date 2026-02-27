@@ -1,0 +1,1 @@
+./sched -m STCF < tests/3.in
