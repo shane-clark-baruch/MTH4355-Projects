@@ -5,7 +5,7 @@ The scheduler is the orchestrator of the operating system and plays a key role i
 of your system.
 Our goal is to have you build multiple schedulers to familiarize ourselves with their construction, strengths, and weaknesses.
 
-There are three specific objectives to this assignment:
+There are two specific objectives to this assignment:
 
 * To further familiarize yourself with the process structure.
 * To learn how processes are scheduled and their states are managed.
@@ -87,6 +87,7 @@ In addition to the functions covered in class so far, you will also need:
 * `strtok`, `strtok_r` and `strsep`: Check out the man pages and see why/how you will need them! One may be more fit to your needs than the others, but you should check each of them! 
 * Structures will help you keep track of your processes info. One may include a name, arrival time, run time, io time, io length... and some others in their process structure.
 * Make a modular program! You are going to have 4 different scheduling policies. I would recommend having a function for each of them. 
+
 
 
 
