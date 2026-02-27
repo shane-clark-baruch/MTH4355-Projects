@@ -66,7 +66,7 @@ t  | Process A | Process B |
 6  | Running   | Dead      |
 7  | Running   | Dead      |
 Average Turn-around Time: 6.000
-Average Response Time: 3.000
+Average Response Time: 0.500
 ```
 Notice the spacing and the formatting of the table above is `3-characters|11-characters|11-characters|`
 
@@ -87,6 +87,7 @@ In addition to the functions covered in class so far, you will also need:
 * `strtok`, `strtok_r` and `strsep`: Check out the man pages and see why/how you will need them! One may be more fit to your needs than the others, but you should check each of them! 
 * Structures will help you keep track of your processes info. One may include a name, arrival time, run time, io time, io length... and some others in their process structure.
 * Make a modular program! You are going to have 4 different scheduling policies. I would recommend having a function for each of them. 
+
 
 
 
