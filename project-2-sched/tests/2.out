@@ -1,0 +1,12 @@
+t  | Process A | Process B | Process C |
+0  | Runnable  |           | Running   |
+1  | Runnable  | Running   | Dead      |
+2  | Runnable  | Running   | Dead      |
+3  | Runnable  | Running   | Dead      |
+4  | Running   | Dead      | Dead      |
+5  | Running   | Dead      | Dead      |
+6  | Running   | Dead      | Dead      |
+7  | Running   | Dead      | Dead      |
+8  | Running   | Dead      | Dead      |
+Average Turn-around Time: 4.333
+Average Response Time: 1.333
