@@ -1,5 +1,5 @@
 
-# Parallel Sed
+# Parallel Stream Editor 
 
 In an earlier project, you implemented a simple compression tool based on
 run-length encoding, known simply as `sed`. Here, you'll implement something
@@ -70,6 +70,17 @@ least) the following issues:
     into the address space, you can then access bytes of the input file via
     pointers and do so quite efficiently. `mmap` is a super cool tool and is internally called
     in many functions you use regularly (like `malloc` and `fread`). 
+
+
+## Testing
+Since the functionality of the program is the same, you can use the test cases from `wsed`. However, in order to see
+the advantage of parallelization, you must consider large files (too large to upload here). Below are some instructions to generate test files yourself
+
+```.sh
+shuf -r -n 1000000 mobydick.txt > bigfile.txt
+```
+
+This command grabs 1000000 lines from a file called `mobydick.txt` (with repetition allowed) and creates `bigfile.txt`. The resulting file was about 40mg. This is a relatively small file... I will test your program on a file roughly 10gb or larger. This means your memory management will be especially important, otherwise you will get into bogged down in IO time.
 
 
 ## Grading
