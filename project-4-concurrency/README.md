@@ -1,10 +1,10 @@
 
-# Parallel Zip
+# Parallel Stream Editor 
 
 In an earlier project, you implemented a simple compression tool based on
-run-length encoding, known simply as `zip`. Here, you'll implement something
-similar, except you'll use threads to make a parallel version of `zip`. We'll
-call this version ... wait for it ... `pzip`. 
+run-length encoding, known simply as `sed`. Here, you'll implement something
+similar, except you'll use threads to make a parallel version of `sed`. We'll
+call this version ... wait for it ... `psed`. 
 
 There are three specific objectives to this assignment:
 
@@ -29,31 +29,30 @@ Read these chapters carefully in order to prepare yourself for this project.
 
 ## Overview
 
-First, recall how `zip` works by reading the description
-[here](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/initial-utilities). 
-You'll use the same basic specification, with run-length encoding as the basic
-technique.
+First, recall how `wsed` works by reading the description
+[here](https://github.com/shane-clark-baruch/MTH4355-Projects/tree/master/project-1-unix). 
+You'll use the same basic specification with translation and substitution components of the stream 
 
-Your parallel zip (`pzip`) will externally look the same; the general usage
+Your parallel sed (`psed`) will externally look the same, but we have added an additional flag. The general usage
 from the command line will be as follows:
 
-```
-prompt> ./pzip file > file.z
+```.sh
+prompt> ./wsed -s 16000 -m translation ab ba test.txt
 ```
 
-As before, there may be many input files (not just one, as above). However,
-internally, the program will use POSIX threads to parallelize the compression
-process.  
+The flag `-s 16000` specifies that each thread with edit a chunk of size `16000` bytes. For example, if your document is `320000`-bytes,
+then you will break up this into 20 chunks of size 16000-bytes. Each of these chunks should be edited by one thread. 
+
 
 ## Considerations
 
 Doing so effectively and with high performance will require you to address (at
 least) the following issues:
 
-- **How to parallelize the compression.** Of course, the central challenge of
-    this project is to parallelize the compression process. Think about what
+- **How to parallelize the editing.** Of course, the central challenge of
+    this project is to parallelize the editing process. Think about what
     can be done in parallel, and what must be done serially by a single
-    thread, and design your parallel zip as appropriate.
+    thread, and design your parallel sed as appropriate.
 
     One interesting issue that the "best" implementations will handle is this:
     what happens if one thread runs more slowly than another? Does the
@@ -64,18 +63,24 @@ least) the following issues:
     for more details. Then, create threads to match the number of CPU
     resources available.
 
-- **How to efficiently perform each piece of work.** While parallelization
-    will yield speed up, each thread's efficiency in performing the
-    compression is also of critical importance. Thus, making the core
-    compression loop as CPU efficient as possible is needed for high
-    performance. 
-
 - **How to access the input file efficiently.** On Linux, there are many ways
     to read from a file, including C standard library calls like `fread()` and
     raw system calls like `read()`. One particularly efficient way is to use
     memory-mapped files, available via `mmap()`. By mapping the input file
     into the address space, you can then access bytes of the input file via
-    pointers and do so quite efficiently. 
+    pointers and do so quite efficiently. `mmap` is a super cool tool and is internally called
+    in many functions you use regularly (like `malloc` and `fread`). 
+
+
+## Testing
+Since the functionality of the program is the same, you can use the test cases from `wsed`. However, in order to see
+the advantage of parallelization, you must consider large files (too large to upload here). Below are some instructions to generate test files yourself
+
+```.sh
+shuf -r -n 1000000 mobydick.txt > bigfile.txt
+```
+
+This command grabs 1000000 lines from a file called `mobydick.txt` (with repetition allowed) and creates `bigfile.txt`. The resulting file was about 40mg. This is a relatively small file... I will test your program on a file roughly 10gb or larger. This means your memory management will be especially important, otherwise you will get into bogged down in IO time.
 
 
 ## Grading
@@ -85,11 +90,10 @@ Your code should compile (and should be compiled) with the following flags:
 optimizer! In fact, for fun, try timing your code with and without `-O` and
 marvel at the difference.
 
-Your code will first be measured for correctness, ensuring that it zips input
+Your code will first be measured for correctness, ensuring that it seds input
 files correctly.
 
-If you pass the correctness tests, your code will be tested for performance;
-higher performance will lead to better scores.
+If you pass the correctness tests, your code will be tested for performance.
 
 
 
