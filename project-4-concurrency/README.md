@@ -93,8 +93,7 @@ marvel at the difference.
 Your code will first be measured for correctness, ensuring that it seds input
 files correctly.
 
-If you pass the correctness tests, your code will be tested for performance;
-higher performance will lead to better scores.
+If you pass the correctness tests, your code will be tested for performance.
 
 
 
