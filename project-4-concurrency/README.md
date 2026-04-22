@@ -37,7 +37,7 @@ Your parallel sed (`psed`) will externally look the same, but we have added an a
 from the command line will be as follows:
 
 ```.sh
-prompt> ./wsed -s 16384 -m translation ab ba test.txt
+prompt> ./wsed -s 16000 -m translation ab ba test.txt
 ```
 
 The flag `-s 16000` specifies that each thread with edit a chunk of size `16000` bytes. For example, if your document is `320000`-bytes,
