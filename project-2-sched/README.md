@@ -44,9 +44,9 @@ For example, lets assume we have a process file `input.txt`:
 1,3,0,0
 ```
 
-Creates two processes, `A` and `B`.  Process A arrives at time 1 and issues an IO after running for 2 time units, becomes blocked for 1 time unit, and will then run for an additional 4 units. Process B arrives at time 1 does not issue an IO time and finishes after running for three time units.
+Creates two processes, `A` and `B`.  Process `A` arrives at time 0 and runs on the CPU for a total of 5 units. `A` will issue an IO after running for 2 time units, becomes blocked for 1 time unit, and will then run for an additional 4 units. Process `B` arrives at time 1 does not issue an IO time and finishes after running for three time units on the CPU.
 
-All proecsses should be named in alphabetical order starting with A. 
+All processes should be named in alphabetical order starting with A. 
 
 ## Output 
 
